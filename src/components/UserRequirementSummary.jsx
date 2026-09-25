@@ -1,114 +1,71 @@
 import React from 'react';
-import { Target, DollarSign, Smartphone, Laptop, Check, Filter, Globe2 } from 'lucide-react';
-import { formatPrice } from '../services/aiParser';
+import { Filter, Globe2 } from 'lucide-react';
 
 export function UserRequirementSummary({ 
-  parsedIntent, 
+  selectedCondition, 
   onConditionToggle, 
-  selectedCondition,
-  activePlatforms,
-  onTogglePlatform
+  activePlatforms, 
+  onTogglePlatform,
+  totalResults
 }) {
-  if (!parsedIntent) return null;
-
-  const { maxPrice, category, useCase, priorities, understoodSummary } = parsedIntent;
-
-  const platforms = [
-    { id: 'uzum', name: 'Uzum Market', color: 'uzum' },
-    { id: 'olcha', name: 'Olcha (Live API)', color: 'olcha' },
-    { id: 'asaxiy', name: 'Asaxiy', color: 'asaxiy' },
-    { id: 'texnomart', name: 'Texnomart', color: 'texnomart' },
-    { id: 'olx', name: 'OLX (B/U)', color: 'olx' }
+  const stores = [
+    { id: 'uzum', name: 'Uzum' },
+    { id: 'olcha', name: 'Olcha' },
+    { id: 'asaxiy', name: 'Asaxiy' },
+    { id: 'texnomart', name: 'Texnomart' },
+    { id: 'olx', name: 'OLX' }
   ];
 
   return (
-    <div className="requirement-summary-card">
-      <div className="summary-left">
-        <div className="summary-badge">
-          <Target size={14} className="text-cyan" />
-          <span>SIZNING TALABINGIZ ASOSIDA TAHLIL:</span>
-        </div>
-
-        <div className="summary-tags-wrap">
-          {/* Budget */}
-          <div className="req-tag budget-tag">
-            <DollarSign size={14} />
-            <span>Budjet: <strong>{maxPrice ? `≤ ${formatPrice(maxPrice)} so'm` : 'Cheklovsiz'}</strong></span>
-          </div>
-
-          {/* Use Case */}
-          <div className="req-tag usecase-tag">
-            <span>Maqsad: <strong>{useCase}</strong></span>
-          </div>
-
-          {/* Category */}
-          <div className="req-tag">
-            {category === 'laptop' ? <Laptop size={14} /> : <Smartphone size={14} />}
-            <span>Kategoriya: <strong>{category === 'laptop' ? 'Noutbuk' : 'Smartfon'}</strong></span>
-          </div>
-
-          {/* Priorities */}
-          {understoodSummary.keyNeeds.map((need, idx) => (
-            <div key={idx} className="req-tag priority-tag">
-              <span>{need}</span>
-            </div>
-          ))}
-        </div>
+    <div className="filter-bar-minimal">
+      {/* Left: Total Results */}
+      <div className="results-counter-pill">
+        <strong>{totalResults} ta</strong> mahsulot topildi
       </div>
 
-      {/* Filter Options: Condition & Platform toggles */}
-      <div className="summary-right">
-        {/* Condition Filter */}
-        <div className="filter-row-group">
-          <span className="filter-title">Holati:</span>
-          <div className="condition-toggle-group">
+      {/* Middle: Store Toggles */}
+      <div className="stores-filter-chips">
+        <span className="filter-caption">Do‘konlar:</span>
+        {stores.map(s => {
+          const isActive = activePlatforms[s.id] !== false;
+          return (
             <button
+              key={s.id}
               type="button"
-              className={`cond-btn ${selectedCondition === 'ALL' ? 'active' : ''}`}
-              onClick={() => onConditionToggle('ALL')}
+              className={`store-filter-btn ${isActive ? 'active' : 'inactive'}`}
+              onClick={() => onTogglePlatform(s.id)}
             >
-              Barchasi
+              <span>{isActive ? '✓' : ''} {s.name}</span>
             </button>
-            <button
-              type="button"
-              className={`cond-btn ${selectedCondition === 'NEW_ONLY' ? 'active' : ''}`}
-              onClick={() => onConditionToggle('NEW_ONLY')}
-            >
-              Faqat Yangi
-            </button>
-            <button
-              type="button"
-              className={`cond-btn ${selectedCondition === 'USED_ALLOWED' ? 'active' : ''}`}
-              onClick={() => onConditionToggle('USED_ALLOWED')}
-            >
-              OLX / B/U
-            </button>
-          </div>
-        </div>
+          );
+        })}
+      </div>
 
-        {/* Platform Selection Chips */}
-        <div className="platforms-filter-group">
-          <span className="filter-title">
-            <Globe2 size={12} className="text-cyan" />
-            Manbalar:
-          </span>
-          <div className="platform-checkboxes">
-            {platforms.map(p => {
-              const isActive = activePlatforms[p.id] !== false;
-              return (
-                <button
-                  key={p.id}
-                  type="button"
-                  className={`platform-filter-chip ${isActive ? 'active ' + p.color : 'inactive'}`}
-                  onClick={() => onTogglePlatform(p.id)}
-                  title={`${p.name} natijalarini yoqish/o'chirish`}
-                >
-                  <span className="check-box-indicator">{isActive ? '✓' : ''}</span>
-                  <span>{p.name}</span>
-                </button>
-              );
-            })}
-          </div>
+      {/* Right: Condition Toggles */}
+      <div className="condition-filter-minimal">
+        <span className="filter-caption">Holati:</span>
+        <div className="condition-btns">
+          <button
+            type="button"
+            className={`cond-pill ${selectedCondition === 'ALL' ? 'active' : ''}`}
+            onClick={() => onConditionToggle('ALL')}
+          >
+            Barchasi
+          </button>
+          <button
+            type="button"
+            className={`cond-pill ${selectedCondition === 'NEW_ONLY' ? 'active' : ''}`}
+            onClick={() => onConditionToggle('NEW_ONLY')}
+          >
+            Yangi
+          </button>
+          <button
+            type="button"
+            className={`cond-pill ${selectedCondition === 'USED_ALLOWED' ? 'active' : ''}`}
+            onClick={() => onConditionToggle('USED_ALLOWED')}
+          >
+            OLX B/U
+          </button>
         </div>
       </div>
     </div>

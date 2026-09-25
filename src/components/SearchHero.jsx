@@ -1,102 +1,83 @@
 import React, { useState } from 'react';
-import { Search, Sparkles, CornerDownLeft, Zap, ArrowRight, RefreshCw } from 'lucide-react';
-import { SAMPLE_QUERIES } from '../data/mockData';
+import { Search, Sparkles, ArrowRight, X } from 'lucide-react';
 
-export function SearchHero({ onSearch, isSearching, currentQuery }) {
+export function SearchHero({ onSearch, currentQuery }) {
   const [inputText, setInputText] = useState(currentQuery || '');
+
+  const quickTags = [
+    { label: 'Barchasi', q: 'barchasi' },
+    { label: 'iPhone 13', q: 'iphone 13' },
+    { label: 'Samsung A55', q: 'samsung a55' },
+    { label: 'Redmi Note 13', q: 'redmi note 13' },
+    { label: 'Honor X9b', q: 'honor x9b' },
+    { label: 'MacBook Air', q: 'macbook air' },
+    { label: '≤ 3 mln (Taxi)', q: '3 mln taxi' },
+    { label: 'Gaming (PUBG)', q: 'pubg poco' }
+  ];
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!inputText.trim()) return;
     onSearch(inputText);
   };
 
-  const handleSelectSample = (sample) => {
-    setInputText(sample.query);
-    onSearch(sample.query);
+  const handleTagClick = (tagQuery) => {
+    setInputText(tagQuery === 'barchasi' ? '' : tagQuery);
+    onSearch(tagQuery);
   };
 
   return (
-    <section className="search-hero">
-      <div className="hero-glow-backdrop"></div>
-      
-      <div className="hero-content">
-        <div className="hero-pill-badge">
-          <Sparkles size={14} className="accent-sparkle" />
-          <span>O‘zbekiston bozoridagi birinchi AI Xarid Agenti</span>
-        </div>
-
-        <h1 className="hero-headline">
-          Nima kerakligini ayting.<br />
-          <span className="headline-gradient">Bozorni o‘zi qidiradi.</span>
+    <section className="search-hero-minimal">
+      <div className="hero-content-minimal">
+        <h1 className="hero-headline-minimal">
+          Nima kerakligini ayting. <span className="headline-gradient">Bozorni o‘zi qidiradi.</span>
         </h1>
-
-        <p className="hero-subtext">
-          Mahsulot nomini qidirish shart emas. Ehtiyojingiz, budjetingiz yoki foydalanish maqsadingizni yozing —
-          AI do‘konlar (Uzum, Asaxiy, Olcha, Texnomart va OLX) bo‘yicha tahlil qilib, eng mosini topadi va sababini tushuntiradi.
+        <p className="hero-subtext-minimal">
+          Uzum, Olcha, Asaxiy, Texnomart va OLX narxlarini bir joyda solishtiring va eng ma’qulini tanlang.
         </p>
 
-        {/* Natural Language Search Input */}
-        <form onSubmit={handleSubmit} className="search-box-wrapper">
-          <div className="search-box-inner">
-            <div className="search-icon-box">
-              {isSearching ? (
-                <RefreshCw size={22} className="spin-anim text-cyan" />
-              ) : (
-                <Sparkles size={22} className="text-cyan sparkle-anim" />
-              )}
-            </div>
-
-            <textarea
-              className="search-textarea"
-              rows={2}
+        {/* Clean Search Input */}
+        <form onSubmit={handleSubmit} className="search-box-minimal">
+          <div className="search-input-wrap">
+            <Search size={20} className="search-icon-muted" />
+            <input
+              type="text"
+              className="search-input-field"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder="Masalan: Menga 3 mln so‘mgacha telefon kerak. Batareyasi kuchli bo‘lsin, kamerasi yaxshi bo‘lsin, Yandex Taxi uchun ishlataman..."
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSubmit(e);
-                }
-              }}
+              placeholder="Masalan: iPhone 13, Samsung A55, 3 mln gacha telefon, noutbuk..."
             />
-
-            <button 
-              type="submit" 
-              className={`search-submit-btn ${isSearching ? 'disabled' : ''}`}
-              disabled={isSearching || !inputText.trim()}
-            >
-              {isSearching ? (
-                <span>Tahlil qilinmoqda...</span>
-              ) : (
-                <>
-                  <span>AI Qidiruv</span>
-                  <ArrowRight size={18} />
-                </>
-              )}
-            </button>
+            {inputText && (
+              <button 
+                type="button" 
+                className="clear-search-btn"
+                onClick={() => {
+                  setInputText('');
+                  onSearch('');
+                }}
+              >
+                <X size={16} />
+              </button>
+            )}
           </div>
+          <button type="submit" className="search-btn-primary">
+            <span>Qidirish</span>
+            <ArrowRight size={16} />
+          </button>
         </form>
 
-        {/* Preset Sample Prompts */}
-        <div className="sample-prompts-section">
-          <div className="sample-label">
-            <Zap size={14} className="text-amber" />
-            <span>Tayyor ehtiyoj namunalari:</span>
-          </div>
-          <div className="sample-chips-grid">
-            {SAMPLE_QUERIES.map((sample) => (
-              <button
-                key={sample.id}
-                type="button"
-                className="sample-chip"
-                onClick={() => handleSelectSample(sample)}
-              >
-                <span className="sample-chip-title">{sample.title}</span>
-                <span className="sample-chip-hint">{sample.tags.join(' • ')}</span>
-              </button>
-            ))}
-          </div>
+        {/* Quick Suggestion Chips */}
+        <div className="quick-tags-row">
+          <span className="quick-tags-label">Tezkor:</span>
+          {quickTags.map((tag, i) => (
+            <button
+              key={i}
+              type="button"
+              className="quick-tag-chip"
+              onClick={() => handleTagClick(tag.q)}
+            >
+              {tag.label}
+            </button>
+          ))}
         </div>
       </div>
     </section>
