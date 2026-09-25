@@ -1,0 +1,6 @@
+/* App-specific overrides if needed */
+.topdim-app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
