@@ -1,6 +1,6 @@
 import React from 'react';
-import { X, GitCompare, ExternalLink, Check, Trash2, Battery, Camera, Cpu, Monitor, Sparkles } from 'lucide-react';
-import { formatPrice } from '../services/aiParser';
+import { X, GitCompare, ExternalLink, Check, Trash2, Battery, Camera, Cpu, Monitor, Sparkles, Tag, CheckCircle2 } from 'lucide-react';
+import { formatPrice } from '../services/searchEngine';
 
 export function CompareDrawer({ compareList, onRemove, onClear, onClose }) {
   if (!compareList || compareList.length === 0) return null;
@@ -22,7 +22,7 @@ export function CompareDrawer({ compareList, onRemove, onClear, onClose }) {
           </div>
         </div>
 
-        <div className="compare-grid" style={{ gridTemplateColumns: `repeat(${compareList.length}, 1fr)` }}>
+        <div className="compare-grid" style={{ gridTemplateColumns: `repeat(${compareList.length}, minmax(240px, 1fr))` }}>
           {compareList.map((product) => (
             <div key={product.id} className="compare-column">
               <div className="compare-top">
@@ -36,6 +36,7 @@ export function CompareDrawer({ compareList, onRemove, onClear, onClose }) {
                 <div className="compare-img-box">
                   <img src={product.image} alt={product.normalized_name} />
                 </div>
+                <div className="compare-cat-label">{product.categoryLabel || product.brand}</div>
                 <h3 className="compare-title">{product.normalized_name}</h3>
                 
                 {/* Price block */}
@@ -57,28 +58,51 @@ export function CompareDrawer({ compareList, onRemove, onClear, onClose }) {
 
               {/* Spec Rows */}
               <div className="compare-specs-section">
-                <div className="spec-row-item">
-                  <span className="spec-row-header"><Battery size={13} /> Batareya</span>
-                  <strong className="spec-row-val">{product.specifications.battery}</strong>
-                  <span className="spec-rating-score">Ball: {product.specifications.batteryScore}/10</span>
-                </div>
+                {/* Main highlights */}
+                {product.specHighlights && product.specHighlights.length > 0 && (
+                  <div className="spec-row-item">
+                    <span className="spec-row-header"><Tag size={13} /> Asosiy parametrlar</span>
+                    <div className="compare-chips-list">
+                      {product.specHighlights.map((chip, ci) => (
+                        <span key={ci} className="spec-chip">{chip}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-                <div className="spec-row-item">
-                  <span className="spec-row-header"><Camera size={13} /> Kamera</span>
-                  <strong className="spec-row-val">{product.specifications.camera}</strong>
-                  <span className="spec-rating-score">Ball: {product.specifications.cameraScore}/10</span>
-                </div>
+                {product.specifications?.screen && (
+                  <div className="spec-row-item">
+                    <span className="spec-row-header"><Monitor size={13} /> Displey</span>
+                    <strong className="spec-row-val">{product.specifications.screen}</strong>
+                  </div>
+                )}
 
-                <div className="spec-row-item">
-                  <span className="spec-row-header"><Cpu size={13} /> Protsessor</span>
-                  <strong className="spec-row-val">{product.specifications.performance}</strong>
-                  <span className="spec-rating-score">Ball: {product.specifications.performanceScore}/10</span>
-                </div>
+                {product.specifications?.battery && (
+                  <div className="spec-row-item">
+                    <span className="spec-row-header"><Battery size={13} /> Batareya</span>
+                    <strong className="spec-row-val">{product.specifications.battery}</strong>
+                    {product.specifications.batteryScore && (
+                      <span className="spec-rating-score">Ball: {product.specifications.batteryScore}/10</span>
+                    )}
+                  </div>
+                )}
 
-                <div className="spec-row-item">
-                  <span className="spec-row-header"><Monitor size={13} /> Displey</span>
-                  <strong className="spec-row-val">{product.specifications.screen}</strong>
-                </div>
+                {product.specifications?.camera && (
+                  <div className="spec-row-item">
+                    <span className="spec-row-header"><Camera size={13} /> Kamera</span>
+                    <strong className="spec-row-val">{product.specifications.camera}</strong>
+                    {product.specifications.cameraScore && (
+                      <span className="spec-rating-score">Ball: {product.specifications.cameraScore}/10</span>
+                    )}
+                  </div>
+                )}
+
+                {product.specifications?.performance && (
+                  <div className="spec-row-item">
+                    <span className="spec-row-header"><Cpu size={13} /> Unumdorlik</span>
+                    <strong className="spec-row-val">{product.specifications.performance}</strong>
+                  </div>
+                )}
 
                 <div className="spec-row-item">
                   <span className="spec-row-header">30 kunlik median narx</span>
@@ -86,10 +110,19 @@ export function CompareDrawer({ compareList, onRemove, onClear, onClose }) {
                 </div>
 
                 {/* AI Shopping verdict */}
-                <div className="spec-row-item ai-verdict-row">
-                  <span className="spec-row-header text-cyan"><Sparkles size={13} /> AI Xulosasi</span>
-                  <p className="verdict-summary-text">{product.aiReasons.verdict}</p>
-                </div>
+                {product.aiReasons?.pros && (
+                  <div className="spec-row-item ai-verdict-row">
+                    <span className="spec-row-header text-cyan"><Sparkles size={13} /> AI Ustunliklari</span>
+                    <ul className="reasons-compact-list">
+                      {product.aiReasons.pros.slice(0, 2).map((pro, pi) => (
+                        <li key={pi} className="reason-bullet">
+                          <CheckCircle2 size={12} className="text-emerald" />
+                          <span>{pro}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             </div>
           ))}

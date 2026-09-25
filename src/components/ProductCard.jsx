@@ -8,7 +8,8 @@ import {
   ChevronUp, 
   ShieldCheck,
   TrendingDown,
-  BellRing
+  BellRing,
+  GitCompare
 } from 'lucide-react';
 import { formatPrice } from '../services/searchEngine';
 
@@ -16,10 +17,12 @@ export function ProductCard({
   product, 
   onOpenPriceHistory, 
   onOpenPriceAlert,
+  onToggleCompare,
+  isCompared = false,
   selectedCondition,
   activePlatforms = {}
 }) {
-  const [isStoresOpen, setIsStoresOpen] = useState(true);
+  const [isStoresOpen, setIsStoresOpen] = useState(false);
 
   // Filter stores according to selectedCondition and activePlatforms
   const filteredStores = (product.stores || []).filter(store => {
@@ -52,7 +55,9 @@ export function ProductCard({
             className="card-thumb-img"
             loading="lazy"
           />
-          <span className="card-brand-badge">{product.brand}</span>
+          <span className="card-brand-badge">
+            {product.brand} {product.categoryLabel ? `• ${product.categoryLabel}` : ''}
+          </span>
         </div>
 
         {/* Center: Details & AI Reasons */}
@@ -67,17 +72,25 @@ export function ProductCard({
 
           {/* Quick Specs Badges */}
           <div className="card-specs-row">
-            {product.specifications?.screen && (
-              <span className="spec-chip">{product.specifications.screen}</span>
-            )}
-            {product.specifications?.battery && (
-              <span className="spec-chip">{product.specifications.battery}</span>
-            )}
-            {product.specifications?.camera && (
-              <span className="spec-chip">{product.specifications.camera}</span>
-            )}
-            {product.specifications?.storage && (
-              <span className="spec-chip">{product.specifications.storage}</span>
+            {product.specHighlights && product.specHighlights.length > 0 ? (
+              product.specHighlights.map((badge, idx) => (
+                <span key={idx} className="spec-chip">{badge}</span>
+              ))
+            ) : (
+              <>
+                {product.specifications?.screen && (
+                  <span className="spec-chip">{product.specifications.screen}</span>
+                )}
+                {product.specifications?.battery && (
+                  <span className="spec-chip">{product.specifications.battery}</span>
+                )}
+                {product.specifications?.camera && (
+                  <span className="spec-chip">{product.specifications.camera}</span>
+                )}
+                {product.specifications?.storage && (
+                  <span className="spec-chip">{product.specifications.storage}</span>
+                )}
+              </>
             )}
           </div>
 
@@ -88,7 +101,7 @@ export function ProductCard({
               <span>Nega tavsiya qilindi:</span>
             </div>
             <ul className="reasons-compact-list">
-              {(product.aiReasons?.pros || []).slice(0, 3).map((pro, i) => (
+              {(product.aiReasons?.pros || []).slice(0, 2).map((pro, i) => (
                 <li key={i} className="reason-bullet">
                   <Check size={14} className="text-emerald check-bullet-icon" />
                   <span>{pro}</span>
@@ -134,6 +147,15 @@ export function ProductCard({
           </a>
 
           <div className="card-mini-actions">
+            <button 
+              type="button" 
+              className={`mini-action-link ${isCompared ? 'active' : ''}`}
+              onClick={() => onToggleCompare && onToggleCompare(product)}
+              title="Mahsulotni taqqoslash ro'yxatiga qo'shish"
+            >
+              <GitCompare size={13} className={isCompared ? 'text-cyan' : ''} />
+              <span>{isCompared ? 'Taqqosda ✓' : 'Taqqoslash'}</span>
+            </button>
             <button 
               type="button" 
               className="mini-action-link"
